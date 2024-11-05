@@ -32,7 +32,7 @@
             height: 100%;
             width: 0;
             background-color: #007bff;
-            transition: width 1s;
+            transition: width 0.1s linear;
         }
         .loading-text {
             font-size: 1.2em;
@@ -50,28 +50,50 @@
     </div>
 
     <script>
-        // Retrieve configuration from localStorage
-        const targetIP = localStorage.getItem('targetIP');
-        const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+        // Retrieve configuration from sessionStorage
+        const fileName = new URLSearchParams(window.location.search).get('fileName');
+        const savedConfig = JSON.parse(sessionStorage.getItem(fileName) || '{}');
+        const selectedServices = savedConfig.selectedServices || [];
         const loadingText = document.getElementById('loadingText');
         const loadingProgress = document.getElementById('loadingProgress');
 
         let currentService = 0;
         const totalServices = selectedServices.length;
 
-        // Function to execute each service
+        // Total duration for the loading process (8 seconds)
+        const totalDuration = 8000;
+        const timePerService = totalServices > 0 ? totalDuration / totalServices : totalDuration;
+
+        // Progress increment amount
+        const progressIncrement = 100 / totalServices;
+        const progressUpdateInterval = totalDuration / (totalServices * 10); // Smooth update every 100ms
+
         function executeService() {
             if (currentService < totalServices) {
+                // Display the current service being executed
                 loadingText.textContent = `Executing service: ${selectedServices[currentService]}`;
-                const progress = ((currentService + 1) / totalServices) * 100;
-                loadingProgress.style.width = `${progress}%`;
                 
-                currentService++;
-                setTimeout(executeService, 1000);  // Simulate 1 second per service
-            } else {
-                // After all services are executed, redirect to report.html
+                // Increment progress bar smoothly
+                let progress = (currentService / totalServices) * 100;
+                const updateProgress = setInterval(() => {
+                    progress += progressIncrement / 10;
+                    if (progress > (currentService + 1) * progressIncrement) {
+                        clearInterval(updateProgress);
+                        progress = (currentService + 1) * progressIncrement;
+                    }
+                    loadingProgress.style.width = `${progress}%`;
+                }, progressUpdateInterval);
+
+                // Move to the next service
                 setTimeout(() => {
-                    window.location.href = 'report.html';
+                    currentService++;
+                    executeService();
+                }, timePerService);
+            } else {
+                // After all services are executed, redirect to report.html with selected services as query parameters
+                const servicesQuery = encodeURIComponent(JSON.stringify(selectedServices));
+                setTimeout(() => {
+                    window.location.href = `report.html?fileName=${encodeURIComponent(fileName)}&services=${servicesQuery}`;
                 }, 1000);
             }
         }

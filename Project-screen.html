@@ -23,24 +23,25 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
             text-align: center;
+            margin: 5px;
         }
-        input[type="text"], input[type="submit"] {
-            width: 90%;
+        input[type="text"], input[type="submit"], .import-button {
+            width: 300px;
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
+            margin: 5px 0;
+            border-radius: 2px;
             border: 1px solid #ccc;
         }
-        input[type="submit"] {
+        input[type="submit"], .import-button {
             background-color: #007bff;
             color: white;
             cursor: pointer;
         }
-        input[type="submit"]:hover {
+        input[type="submit"]:hover, .import-button:hover {
             background-color: #0056b3;
         }
         .project-list {
-            margin-top: 20px;
+            margin-top: 10px;
             width: 300px;
         }
         .project-item {
@@ -64,6 +65,13 @@
         .configure-button:hover {
             background-color: #218838;
         }
+        .import-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #fileInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -74,16 +82,53 @@
             <input type="text" id="fileName" name="fileName" placeholder="Enter Project File Name" required>
             <input type="submit" value="Create Project">
         </form>
+       
     </div>
 
+
+
+    <div class="container">
     <div class="project-list" id="projectList">
         <h3>Existing Projects</h3>
         <!-- Existing projects will be listed here -->
     </div>
-
+    </div>
+    <input type="file" id="fileInput" accept=".json">
+    <button class="import-button" onclick="document.getElementById('fileInput').click()">Import Projects</button>
     <script>
+
+        function addProjectToList(project) {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            projectItem.innerHTML = `<strong>${project.fileName}</strong> by ${project.initials}`;
+        
+            const configureButton = document.createElement('button');
+            configureButton.className = 'configure-button';
+            configureButton.textContent = 'Configure';
+            configureButton.addEventListener('click', () => {
+                window.location.href = `configuration.html?fileName=${encodeURIComponent(project.fileName)}`;
+            });
+        
+            projectItem.appendChild(configureButton);
+            projectList.appendChild(projectItem);
+        }
+        
+        // Load existing projects from sessionStorage
+        window.onload = function() {
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) {
+                    const project = JSON.parse(sessionStorage.getItem(key));
+                    if (project && project.fileName && project.initials) {
+                        addProjectToList(project);
+                    }
+                }
+            }
+        };
+
         const projectForm = document.getElementById('projectForm');
         const projectList = document.getElementById('projectList');
+        const fileInput = document.getElementById('fileInput');
 
         const projects = [];
 
@@ -92,12 +137,38 @@
 
             const initials = document.getElementById('initials').value;
             const fileName = document.getElementById('fileName').value;
+            sessionStorage.setItem('FileName', fileName)
 
             if (initials && fileName) {
                 const project = { initials, fileName };
                 projects.push(project);
                 addProjectToList(project);
                 projectForm.reset();
+            }
+        });
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedProjects = JSON.parse(e.target.result);
+                        if (Array.isArray(importedProjects)) {
+                            importedProjects.forEach(project => {
+                                if (project.initials && project.fileName) {
+                                    projects.push(project);
+                                    addProjectToList(project);
+                                }
+                            });
+                        } else {
+                            alert('Invalid JSON format. Please provide an array of projects.');
+                        }
+                    } catch (error) {
+                        alert('Error parsing JSON file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
             }
         });
 
@@ -116,6 +187,7 @@
             projectItem.appendChild(configureButton);
             projectList.appendChild(projectItem);
         }
+
     </script>
 </body>
 </html>

@@ -41,17 +41,35 @@
             font-size: 0.9em;
             color: #333;
         }
+        .return-button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        .return-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="report-container">
         <h2 class="report-title">Test Report</h2>
         <div id="reportContent"></div>
+        <a href="project-screen.html" class="return-button">Return to Project Screen</a>
     </div>
 
     <script>
-        // Retrieve selected services from localStorage
-        const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+        // Retrieve selected services from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const services = JSON.parse(decodeURIComponent(params.get('services') || '[]'));
 
         // Function to generate random data for each service
         function generateRandomData(service) {
@@ -75,9 +93,9 @@
             }
         }
 
-        // Populate the report content
+        // Populate the report content with executed services
         const reportContent = document.getElementById('reportContent');
-        selectedServices.forEach(service => {
+        services.forEach(service => {
             const serviceContainer = document.createElement('div');
             serviceContainer.classList.add('report-item');
 

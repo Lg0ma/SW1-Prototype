@@ -93,8 +93,6 @@
 <body>
     <div class="config-container">
         <h2 class="config-title">Configure Project</h2>
-        <p id="projectName">Configuring: Home</p>
-
         <input type="text" id="targetIP" class="input-box" placeholder="Target Machine IP" required>
 
         <div class="dropdown" id="servicesDropdown">
@@ -155,6 +153,50 @@
                 document.getElementById('servicesDropdown').classList.remove('active');
             }
         }
+
+        // Save configuration and start test
+        function startTest() {
+            const targetIP = document.getElementById('targetIP').value;
+            const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked')).map(checkbox => checkbox.value);
+            const fileName = new URLSearchParams(window.location.search).get('fileName');
+
+            if (!targetIP) {
+                alert("Please enter a Target Machine IP.");
+                return;
+            }
+
+            // Save configuration to sessionStorage along with the fileName
+            const projectConfig = {
+                fileName: fileName,
+                targetIP: targetIP,
+                selectedServices: selectedServices
+            };
+
+            sessionStorage.setItem(fileName, JSON.stringify(projectConfig));
+
+            // Redirect to loading screen
+            window.location.href = 'loading.html';
+        }
+
+        // Load previous configuration if available
+        window.onload = function() {
+            const fileName = new URLSearchParams(window.location.search).get('fileName');
+            if (fileName) {
+                const savedConfig = JSON.parse(sessionStorage.getItem(fileName) || '{}');
+                if (savedConfig.targetIP) {
+                    document.getElementById('targetIP').value = savedConfig.targetIP;
+                }
+                if (savedConfig.selectedServices) {
+                    savedConfig.selectedServices.forEach(service => {
+                        const checkbox = Array.from(document.querySelectorAll('input[name="services"]')).find(cb => cb.value === service);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                    updateSelection();
+                }
+            }
+        };
     </script>
 </body>
 </html>
