@@ -133,31 +133,6 @@
         function startTest() {
             const targetIP = document.getElementById('targetIP').value;
             const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked')).map(checkbox => checkbox.value);
-
-            if (!targetIP) {
-                alert("Please enter a Target Machine IP.");
-                return;
-            }
-
-            // Save configuration to localStorage
-            localStorage.setItem('targetIP', targetIP);
-            localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
-
-            // Redirect to loading screen
-            window.location.href = 'loading.html';
-        }
-
-        // Close dropdown if clicked outside
-        window.onclick = function(event) {
-            if (!event.target.closest('.dropdown-button') && !event.target.closest('.dropdown-content')) {
-                document.getElementById('servicesDropdown').classList.remove('active');
-            }
-        }
-
-        // Save configuration and start test
-        function startTest() {
-            const targetIP = document.getElementById('targetIP').value;
-            const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked')).map(checkbox => checkbox.value);
             const fileName = new URLSearchParams(window.location.search).get('fileName');
 
             if (!targetIP) {
@@ -175,7 +150,7 @@
             sessionStorage.setItem(fileName, JSON.stringify(projectConfig));
 
             // Redirect to loading screen
-            window.location.href = 'loading.html';
+            window.location.href = `loading.html?fileName=${encodeURIComponent(fileName)}`;
         }
 
         // Load previous configuration if available
