@@ -67,9 +67,10 @@
     </div>
 
     <script>
-        // Retrieve selected services from URL parameters
-        const params = new URLSearchParams(window.location.search);
-        const services = JSON.parse(decodeURIComponent(params.get('services') || '[]'));
+        // Retrieve selected services from sessionStorage
+        const services = JSON.parse(sessionStorage.getItem('executedServices') || '[]');
+        console.log('Retrieved Services:', services); // Debugging line
+
 
         // Function to generate random data for each service
         function generateRandomData(service) {

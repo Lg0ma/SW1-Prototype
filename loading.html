@@ -64,37 +64,29 @@
         const totalDuration = 8000;
         const timePerService = totalServices > 0 ? totalDuration / totalServices : totalDuration;
 
-        // Progress increment amount
-        const progressIncrement = 100 / totalServices;
-        const progressUpdateInterval = totalDuration / (totalServices * 10); // Smooth update every 100ms
-
+        // Function to execute each service and update progress
         function executeService() {
             if (currentService < totalServices) {
                 // Display the current service being executed
                 loadingText.textContent = `Executing service: ${selectedServices[currentService]}`;
-                
-                // Increment progress bar smoothly
-                let progress = (currentService / totalServices) * 100;
-                const updateProgress = setInterval(() => {
-                    progress += progressIncrement / 10;
-                    if (progress > (currentService + 1) * progressIncrement) {
-                        clearInterval(updateProgress);
-                        progress = (currentService + 1) * progressIncrement;
-                    }
-                    loadingProgress.style.width = `${progress}%`;
-                }, progressUpdateInterval);
 
-                // Move to the next service
-                setTimeout(() => {
-                    currentService++;
-                    executeService();
-                }, timePerService);
+                // Increment progress bar smoothly for the current service
+                let startTime = Date.now();
+                const updateProgress = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(((currentService + elapsed / timePerService) / totalServices) * 100, ((currentService + 1) / totalServices) * 100);
+                    loadingProgress.style.width = `${progress}%`;
+
+                    if (elapsed >= timePerService) {
+                        clearInterval(updateProgress);
+                        currentService++;
+                        executeService();
+                    }
+                }, 100); // Update every 100ms
             } else {
-                // After all services are executed, redirect to report.html with selected services as query parameters
-                const servicesQuery = encodeURIComponent(JSON.stringify(selectedServices));
-                setTimeout(() => {
-                    window.location.href = `report.html?fileName=${encodeURIComponent(fileName)}&services=${servicesQuery}`;
-                }, 1000);
+                // After all services are executed, redirect to report.html with selected services saved in sessionStorage
+                sessionStorage.setItem('executedServices', JSON.stringify(selectedServices));
+                window.location.href = `report.html?fileName=${encodeURIComponent(fileName)}`;
             }
         }
 
