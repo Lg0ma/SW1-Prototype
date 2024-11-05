@@ -95,6 +95,93 @@
     </div>
     <input type="file" id="fileInput" accept=".json">
     <button class="import-button" onclick="document.getElementById('fileInput').click()">Import Projects</button>
+    
+    <script>
+        function addProjectToList(project) {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            projectItem.innerHTML = `<strong>${project.fileName}</strong> by ${project.initials}`;
+    
+            const configureButton = document.createElement('button');
+            configureButton.className = 'configure-button';
+            configureButton.textContent = 'Configure';
+            configureButton.addEventListener('click', () => {
+                window.location.href = `configuration.html?fileName=${encodeURIComponent(project.fileName)}`;
+            });
+    
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'configure-button';
+            deleteButton.textContent = 'Delete';
+            deleteButton.style.backgroundColor = '#dc3545'; // Set delete button color to red
+            deleteButton.addEventListener('click', () => {
+                sessionStorage.removeItem(project.fileName);
+                projectItem.remove();
+            });
+    
+            projectItem.appendChild(configureButton);
+            projectItem.appendChild(deleteButton);
+            projectList.appendChild(projectItem);
+        }
+    
+        // Load existing projects from sessionStorage
+        window.onload = function() {
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) {
+                    const project = JSON.parse(sessionStorage.getItem(key));
+                    if (project && project.fileName && project.initials) {
+                        addProjectToList(project);
+                    }
+                }
+            }
+        };
+    
+        const projectForm = document.getElementById('projectForm');
+        const projectList = document.getElementById('projectList');
+        const fileInput = document.getElementById('fileInput');
+    
+        const projects = [];
+    
+        projectForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const initials = document.getElementById('initials').value;
+            const fileName = document.getElementById('fileName').value;
+            const project = { initials, fileName };
+    
+            sessionStorage.setItem(fileName, JSON.stringify(project));
+            projects.push(project);
+            addProjectToList(project);
+            projectForm.reset();
+        });
+    
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedProjects = JSON.parse(e.target.result);
+                        if (Array.isArray(importedProjects)) {
+                            importedProjects.forEach(project => {
+                                if (project.initials && project.fileName) {
+                                    projects.push(project);
+                                    sessionStorage.setItem(project.fileName, JSON.stringify(project));
+                                    addProjectToList(project);
+                                }
+                            });
+                        } else {
+                            alert('Invalid JSON format. Please provide an array of projects.');
+                        }
+                    } catch (error) {
+                        alert('Error parsing JSON file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+    
     <script>
 
         function addProjectToList(project) {
