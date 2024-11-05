@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .config-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        .config-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .dropdown {
+            position: relative;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .dropdown-button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+        .dropdown-content label {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+        .dropdown-content label:hover {
+            background-color: #f0f0f0;
+        }
+        .input-box {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="config-container">
+        <h2 class="config-title">Configure Project</h2>
+        <p id="projectName">Configuring: Home</p>
+
+        <input type="text" id="targetIP" class="input-box" placeholder="Target Machine IP" required>
+
+        <div class="dropdown" id="servicesDropdown">
+            <div class="dropdown-button" onclick="toggleDropdown()">
+                <span id="dropdownText">Select Services</span>
+                <span>&#9660;</span>
+            </div>
+            <div class="dropdown-content">
+                <label><input type="checkbox" name="services" value="Directory and File Brute-forcing" onclick="updateSelection()"> Directory and File Brute-forcing</label>
+                <label><input type="checkbox" name="services" value="HTTP Request/Response Handling" onclick="updateSelection()"> HTTP Request/Response Handling</label>
+                <label><input type="checkbox" name="services" value="Crawling and Spidering" onclick="updateSelection()"> Crawling and Spidering</label>
+                <label><input type="checkbox" name="services" value="Fuzzing Capabilities" onclick="updateSelection()"> Fuzzing Capabilities</label>
+                <label><input type="checkbox" name="services" value="Result Logging and Filtering" onclick="updateSelection()"> Result Logging and Filtering</label>
+                <label><input type="checkbox" name="services" value="Automatic Detection of SQL Injection" onclick="updateSelection()"> Automatic Detection of SQL Injection</label>
+                <label><input type="checkbox" name="services" value="Database Enumeration" onclick="updateSelection()"> Database Enumeration</label>
+            </div>
+        </div>
+        
+        <button onclick="startTest()">Start Test</button>
+    </div>
+
+    <script>
+        // Toggle dropdown visibility
+        function toggleDropdown() {
+            document.getElementById('servicesDropdown').classList.toggle('active');
+        }
+
+        // Update the dropdown button text based on selected services
+        function updateSelection() {
+            const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked'))
+                .map(checkbox => checkbox.parentElement.textContent.trim());
+
+            const dropdownText = document.getElementById('dropdownText');
+            dropdownText.textContent = selectedServices.length > 0 ? selectedServices.join(', ') : 'Select Services';
+        }
+
+        // Save configuration and start test
+        function startTest() {
+            const targetIP = document.getElementById('targetIP').value;
+            const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked')).map(checkbox => checkbox.value);
+
+            if (!targetIP) {
+                alert("Please enter a Target Machine IP.");
+                return;
+            }
+
+            // Save configuration to localStorage
+            localStorage.setItem('targetIP', targetIP);
+            localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+
+            // Redirect to loading screen
+            window.location.href = 'loading.html';
+        }
+
+        // Close dropdown if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.dropdown-button') && !event.target.closest('.dropdown-content')) {
+                document.getElementById('servicesDropdown').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .loading-container {
+            text-align: center;
+        }
+        .loading-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+            height: 20px;
+            width: 300px;
+        }
+        .loading-progress {
+            height: 100%;
+            width: 0;
+            background-color: #007bff;
+            transition: width 1s;
+        }
+        .loading-text {
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <h2>Executing Test</h2>
+        <p class="loading-text" id="loadingText">Initializing...</p>
+    </div>
+    <div class="loading-bar">
+        <div class="loading-progress" id="loadingProgress"></div>
+    </div>
+
+    <script>
+        // Retrieve configuration from localStorage
+        const targetIP = localStorage.getItem('targetIP');
+        const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+        const loadingText = document.getElementById('loadingText');
+        const loadingProgress = document.getElementById('loadingProgress');
+
+        let currentService = 0;
+        const totalServices = selectedServices.length;
+
+        // Function to execute each service
+        function executeService() {
+            if (currentService < totalServices) {
+                loadingText.textContent = `Executing service: ${selectedServices[currentService]}`;
+                const progress = ((currentService + 1) / totalServices) * 100;
+                loadingProgress.style.width = `${progress}%`;
+                
+                currentService++;
+                setTimeout(executeService, 1000);  // Simulate 1 second per service
+            } else {
+                // After all services are executed, redirect to report.html
+                setTimeout(() => {
+                    window.location.href = 'report.html';
+                }, 1000);
+            }
+        }
+
+        // Start executing services
+        executeService();
+    </script>
+</body>
+</html>

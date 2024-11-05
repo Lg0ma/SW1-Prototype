@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .report-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: left;
+        }
+        .report-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .report-item {
+            margin-bottom: 20px;
+        }
+        .service-name {
+            font-weight: bold;
+        }
+        .service-output {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <h2 class="report-title">Test Report</h2>
+        <div id="reportContent"></div>
+    </div>
+
+    <script>
+        // Retrieve selected services from localStorage
+        const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+
+        // Function to generate random data for each service
+        function generateRandomData(service) {
+            switch(service) {
+                case "Directory and File Brute-forcing":
+                    return "Directories found:\n- /admin\n- /login\n- /api\nFiles found:\n- config.php\n- index.html";
+                case "HTTP Request/Response Handling":
+                    return "Request Sent:\nGET / HTTP/1.1\nResponse Code: 200\nContent Length: 5234 bytes";
+                case "Crawling and Spidering":
+                    return "Pages Discovered:\n- /about\n- /contact\n- /products\n- /blog/post1";
+                case "Fuzzing Capabilities":
+                    return "Parameters Fuzzed:\n- username: Possible SQL injection\n- email: Reflected XSS detected";
+                case "Result Logging and Filtering":
+                    return "Logged Results:\n- 200 OK: 10 responses\n- 404 Not Found: 5 responses\n- 500 Internal Server Error: 2 responses";
+                case "Automatic Detection of SQL Injection":
+                    return "Potential SQL Injection detected on parameter 'id'\nPayloads used:\n- ' OR 1=1--\n- ' UNION SELECT";
+                case "Database Enumeration":
+                    return "Database Structure:\n- Tables found: users, orders, products\n- Columns in 'users': id, username, password, email";
+                default:
+                    return "No data available";
+            }
+        }
+
+        // Populate the report content
+        const reportContent = document.getElementById('reportContent');
+        selectedServices.forEach(service => {
+            const serviceContainer = document.createElement('div');
+            serviceContainer.classList.add('report-item');
+
+            const serviceName = document.createElement('div');
+            serviceName.classList.add('service-name');
+            serviceName.textContent = service;
+
+            const serviceOutput = document.createElement('div');
+            serviceOutput.classList.add('service-output');
+            serviceOutput.textContent = generateRandomData(service);
+
+            serviceContainer.appendChild(serviceName);
+            serviceContainer.appendChild(serviceOutput);
+            reportContent.appendChild(serviceContainer);
+        });
+    </script>
+</body>
+</html>

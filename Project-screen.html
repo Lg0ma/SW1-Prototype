@@ -1,22 +1,121 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-        
-        <script src="" async defer></script>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Creation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input[type="text"], input[type="submit"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .project-list {
+            margin-top: 20px;
+            width: 300px;
+        }
+        .project-item {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .configure-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .configure-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create a New Project</h2>
+        <form id="projectForm">
+            <input type="text" id="initials" name="initials" placeholder="Enter Your Initials" required>
+            <input type="text" id="fileName" name="fileName" placeholder="Enter Project File Name" required>
+            <input type="submit" value="Create Project">
+        </form>
+    </div>
+
+    <div class="project-list" id="projectList">
+        <h3>Existing Projects</h3>
+        <!-- Existing projects will be listed here -->
+    </div>
+
+    <script>
+        const projectForm = document.getElementById('projectForm');
+        const projectList = document.getElementById('projectList');
+
+        const projects = [];
+
+        projectForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const initials = document.getElementById('initials').value;
+            const fileName = document.getElementById('fileName').value;
+
+            if (initials && fileName) {
+                const project = { initials, fileName };
+                projects.push(project);
+                addProjectToList(project);
+                projectForm.reset();
+            }
+        });
+
+        function addProjectToList(project) {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            projectItem.innerHTML = `<strong>${project.fileName}</strong> by ${project.initials}`;
+            
+            const configureButton = document.createElement('button');
+            configureButton.className = 'configure-button';
+            configureButton.textContent = 'Configure';
+            configureButton.addEventListener('click', () => {
+                window.location.href = `configuration.html?fileName=${encodeURIComponent(project.fileName)}`;
+            });
+
+            projectItem.appendChild(configureButton);
+            projectList.appendChild(projectItem);
+        }
+    </script>
+</body>
 </html>
